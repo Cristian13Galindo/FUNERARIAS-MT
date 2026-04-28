@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── CSS Custom Properties (sobreescritas dinámicamente por TenantService.applyTheme) ── */
+:root {
+  --primary-color:   #18222e;   /* default: oscuro */
+  --secondary-color: #bf9f62;   /* default: dorado */
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #0d1117;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: rgba(191,159,98,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(191,159,98,0.5); }
+
+/* Selection */
+::selection {
+  background: rgba(191,159,98,0.25);
+  color: #fff;
+}
+
+/* Smooth page transitions */
+router-outlet + * {
+  animation: pageIn 0.3s ease;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

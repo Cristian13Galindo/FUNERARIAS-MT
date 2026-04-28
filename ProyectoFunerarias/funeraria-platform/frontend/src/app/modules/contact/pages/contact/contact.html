@@ -1,0 +1,76 @@
+<div class="contact-wrapper">
+  <div class="contact-header">
+    <h1>Contáctenos</h1>
+    <p>Estamos disponibles para atender su consulta en cualquier momento</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-info">
+      <div class="info-card" id="info-phone">
+        <span class="info-icon">📞</span>
+        <div>
+          <h3>Teléfono / WhatsApp</h3>
+          <p>Disponible 24 horas los 7 días</p>
+        </div>
+      </div>
+      <div class="info-card" id="info-email">
+        <span class="info-icon">✉️</span>
+        <div>
+          <h3>Correo electrónico</h3>
+          <p>Respuesta en menos de 2 horas</p>
+        </div>
+      </div>
+      <div class="info-card" id="info-location">
+        <span class="info-icon">📍</span>
+        <div>
+          <h3>Atención personalizada</h3>
+          <p>Nos desplazamos hasta donde usted nos necesite</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="success-msg" *ngIf="success">
+        ✅ Mensaje enviado correctamente. Nos comunicaremos pronto.
+      </div>
+
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" id="contact-form" *ngIf="!success" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nombre completo *</label>
+            <input id="name" type="text" formControlName="name" placeholder="Su nombre">
+            <span class="field-error" *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+              Campo obligatorio
+            </span>
+          </div>
+          <div class="form-group">
+            <label for="phone">Teléfono</label>
+            <input id="phone" type="tel" formControlName="phone" placeholder="300 000 0000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-email">Correo electrónico *</label>
+          <input id="contact-email" type="email" formControlName="email" placeholder="correo@ejemplo.com">
+          <span class="field-error" *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+            Correo inválido
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Mensaje *</label>
+          <textarea id="message" formControlName="message" rows="5" placeholder="Describa cómo podemos ayudarle..."></textarea>
+          <span class="field-error" *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+            Mínimo 10 caracteres
+          </span>
+        </div>
+
+        <div class="error-banner" *ngIf="errorMsg">⚠️ {{ errorMsg }}</div>
+
+        <button id="contact-submit-btn" type="submit" class="btn-submit" [disabled]="loading">
+          {{ loading ? 'Enviando...' : 'Enviar mensaje' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

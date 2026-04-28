@@ -1,0 +1,107 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🕊️</span><span class="brand-text">Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" id="nav-dashboard">📊 Dashboard</a>
+      <a routerLink="/admin/products" routerLinkActive="active" id="nav-products">📦 Productos</a>
+      <a routerLink="/admin/users" routerLinkActive="active" id="nav-users">👥 Usuarios</a>
+      <a routerLink="/admin/config" routerLinkActive="active" id="nav-config">⚙️ Configuración</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>Gestión de Productos</h1>
+        <p>Administra el catálogo de arreglos florales y féretros</p>
+      </div>
+      <button id="add-product-btn" class="btn-add" (click)="openCreate()">+ Nuevo Producto</button>
+    </div>
+
+    <!-- Form Modal -->
+    <div class="modal-overlay" *ngIf="showForm" (click)="cancelForm()">
+      <div class="modal-card" (click)="$event.stopPropagation()" id="product-form-modal">
+        <h2>{{ editingProduct ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+        <form [formGroup]="productForm" (ngSubmit)="saveProduct()" novalidate>
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" formControlName="title" placeholder="Nombre del producto" id="product-title">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo *</label>
+              <select formControlName="type" id="product-type">
+                <option value="flower">Arreglo Floral</option>
+                <option value="coffin">Féretro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Precio (COP)</label>
+              <input type="number" formControlName="price" placeholder="Consultar" id="product-price">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea formControlName="description" rows="3" placeholder="Descripción del producto" id="product-description"></textarea>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" formControlName="is_visible" id="product-visible">
+            <label for="product-visible">Visible en el catálogo público</label>
+          </div>
+          <div class="error-banner" *ngIf="errorMsg">⚠️ {{ errorMsg }}</div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelForm()" id="cancel-product-btn">Cancelar</button>
+            <button type="submit" class="btn-save" [disabled]="saving || productForm.invalid" id="save-product-btn">
+              {{ saving ? 'Guardando...' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner-circle"></div><span>Cargando...</span>
+    </div>
+
+    <div class="table-card" *ngIf="!loading">
+      <table class="data-table" id="products-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Visible</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of products; let i = index" [id]="'product-row-' + i">
+            <td class="product-name">
+              <span class="type-icon">{{ p.type === 'flower' ? '🌹' : '⚱️' }}</span>
+              {{ p.title }}
+            </td>
+            <td>
+              <span class="badge" [class.badge-flower]="p.type === 'flower'" [class.badge-coffin]="p.type === 'coffin'">
+                {{ p.type === 'flower' ? 'Floral' : 'Féretro' }}
+              </span>
+            </td>
+            <td>{{ p.price ? ('$' + (p.price | number:'1.0-0') + ' COP') : 'Consultar' }}</td>
+            <td>
+              <span class="status-dot" [class.active]="p.is_visible" [class.inactive]="!p.is_visible">
+                {{ p.is_visible ? 'Sí' : 'No' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn-edit" (click)="openEdit(p)" [id]="'edit-product-' + i">Editar</button>
+              <button class="btn-delete" (click)="deleteProduct(p._id)" [id]="'delete-product-' + i">Eliminar</button>
+            </td>
+          </tr>
+          <tr *ngIf="products.length === 0">
+            <td colspan="5" class="empty-row">No hay productos. Crea el primero.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>

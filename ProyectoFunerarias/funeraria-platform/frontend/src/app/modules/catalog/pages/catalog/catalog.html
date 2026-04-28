@@ -1,0 +1,61 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <h1>Catálogo de Productos</h1>
+    <p>Explore nuestra selección de servicios y productos funerarios</p>
+  </div>
+
+  <div class="filter-bar">
+    <button
+      id="filter-all"
+      [class.active]="activeFilter === 'all'"
+      (click)="filter('all')">
+      Todos
+    </button>
+    <button
+      id="filter-flowers"
+      [class.active]="activeFilter === 'flower'"
+      (click)="filter('flower')">
+      🌹 Arreglos Florales
+    </button>
+    <button
+      id="filter-coffins"
+      [class.active]="activeFilter === 'coffin'"
+      (click)="filter('coffin')">
+      ⚱️ Féretros
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-circle"></div>
+    <span>Cargando productos...</span>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filtered.length === 0">
+    <span class="empty-icon">📦</span>
+    <p>No hay productos disponibles en esta categoría.</p>
+    <a routerLink="/contact" class="btn-contact">Consultar disponibilidad</a>
+  </div>
+
+  <div class="products-grid" *ngIf="!loading && filtered.length > 0">
+    <div
+      class="product-card"
+      *ngFor="let product of filtered; let i = index"
+      [id]="'catalog-product-' + i">
+      <div class="product-img">
+        <span>{{ product.type === 'flower' ? '🌹' : '⚱️' }}</span>
+      </div>
+      <div class="product-body">
+        <span class="badge">{{ product.type === 'flower' ? 'Floral' : 'Féretro' }}</span>
+        <h2>{{ product.title }}</h2>
+        <p>{{ product.description }}</p>
+        <div class="product-footer">
+          <span class="price" *ngIf="product.price">
+            ${{ product.price | number:'1.0-0' }} COP
+          </span>
+          <span class="price consult" *ngIf="!product.price">Consultar precio</span>
+          <a routerLink="/contact" class="btn-inquiry">Solicitar info</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

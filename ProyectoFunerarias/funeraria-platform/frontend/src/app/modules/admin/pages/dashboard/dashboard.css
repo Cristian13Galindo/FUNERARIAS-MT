@@ -1,0 +1,210 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #0d1117;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: rgba(255,255,255,0.03);
+  border-right: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.5rem 1rem;
+  font-size: 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.brand-text {
+  color: #bf9f62;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.75rem;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background: rgba(191,159,98,0.1);
+  color: #bf9f62;
+}
+
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.user-avatar {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #bf9f62, #a8853a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d1117;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.user-meta { display: flex; flex-direction: column; }
+.user-name { color: #fff; font-size: 0.85rem; font-weight: 600; }
+.user-role {
+  color: rgba(255,255,255,0.35);
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.btn-logout {
+  width: 100%;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  color: #f87171;
+  padding: 0.55rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-logout:hover { background: rgba(239,68,68,0.15); }
+
+/* ── Main Content ────────────────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2.5rem;
+}
+
+.page-header { margin-bottom: 2rem; }
+
+.page-header h1 {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+}
+
+.page-header p {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.page-header strong { color: #bf9f62; }
+
+/* ── Stats ───────────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: border-color 0.3s;
+}
+
+.stat-card:hover { border-color: rgba(191,159,98,0.25); }
+
+.stat-icon { font-size: 2rem; }
+
+.stat-body { display: flex; flex-direction: column; }
+
+.stat-number {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stat-label {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* ── Quick Links ─────────────────────────────────────────────────── */
+.quick-links h2 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.quick-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-decoration: none;
+  transition: border-color 0.3s, transform 0.3s;
+  display: block;
+}
+
+.quick-card:hover {
+  border-color: rgba(191,159,98,0.3);
+  transform: translateY(-3px);
+}
+
+.quick-card > span { font-size: 2rem; display: block; margin-bottom: 0.75rem; }
+
+.quick-card h3 {
+  color: #bf9f62;
+  font-size: 0.9rem;
+  margin: 0 0 0.35rem;
+}
+
+.quick-card p {
+  color: rgba(255,255,255,0.35);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0;
+}

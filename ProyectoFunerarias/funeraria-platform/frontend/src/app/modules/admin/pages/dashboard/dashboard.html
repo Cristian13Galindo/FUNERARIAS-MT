@@ -1,0 +1,91 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="admin-sidebar">
+    <div class="sidebar-brand">
+      <span>🕊️</span>
+      <span class="brand-text">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" id="nav-dashboard">
+        📊 Dashboard
+      </a>
+      <a routerLink="/admin/products" routerLinkActive="active" id="nav-products">
+        📦 Productos
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active" id="nav-users">
+        👥 Usuarios
+      </a>
+      <a routerLink="/admin/config" routerLinkActive="active" id="nav-config">
+        ⚙️ Configuración
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info" *ngIf="user">
+        <div class="user-avatar">{{ user.first_name?.charAt(0) || '?' }}</div>
+        <div class="user-meta">
+          <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+          <span class="user-role">{{ user.role }}</span>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn-logout" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Panel de Administración</h1>
+      <p>Bienvenido, <strong>{{ user?.first_name }}</strong></p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-icon">📦</div>
+        <div class="stat-body">
+          <span class="stat-number">{{ loading ? '...' : totalProducts }}</span>
+          <span class="stat-label">Total Productos</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-flowers">
+        <div class="stat-icon">🌹</div>
+        <div class="stat-body">
+          <span class="stat-number">{{ loading ? '...' : flowers }}</span>
+          <span class="stat-label">Arreglos Florales</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-coffins">
+        <div class="stat-icon">⚱️</div>
+        <div class="stat-body">
+          <span class="stat-number">{{ loading ? '...' : coffins }}</span>
+          <span class="stat-label">Féretros</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <h2>Acceso Rápido</h2>
+      <div class="links-grid">
+        <a routerLink="/admin/products" class="quick-card" id="quick-products">
+          <span>📦</span>
+          <h3>Gestionar Productos</h3>
+          <p>Agregar, editar o eliminar productos del catálogo</p>
+        </a>
+        <a routerLink="/admin/users" class="quick-card" id="quick-users">
+          <span>👥</span>
+          <h3>Gestionar Usuarios</h3>
+          <p>Administrar operarios y roles del sistema</p>
+        </a>
+        <a routerLink="/admin/config" class="quick-card" id="quick-config">
+          <span>⚙️</span>
+          <h3>Configuración</h3>
+          <p>Personalizar colores, contacto y datos bancarios</p>
+        </a>
+        <a routerLink="/home" class="quick-card" id="quick-public" target="_blank">
+          <span>🌐</span>
+          <h3>Ver Sitio Público</h3>
+          <p>Previsualizar cómo ve el cliente su sitio</p>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>

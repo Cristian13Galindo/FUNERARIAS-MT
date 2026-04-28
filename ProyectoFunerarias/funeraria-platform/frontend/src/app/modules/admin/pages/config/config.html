@@ -1,0 +1,73 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🕊️</span><span class="brand-text">Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active">📊 Dashboard</a>
+      <a routerLink="/admin/products" routerLinkActive="active">📦 Productos</a>
+      <a routerLink="/admin/users" routerLinkActive="active">👥 Usuarios</a>
+      <a routerLink="/admin/config" routerLinkActive="active">⚙️ Configuración</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Configuración de la Funeraria</h1>
+      <p>Personalice los colores, datos de contacto e información bancaria</p>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner-circle"></div><span>Cargando configuración...</span>
+    </div>
+
+    <div class="config-card" *ngIf="!loading">
+      <form [formGroup]="configForm" (ngSubmit)="saveConfig()" id="config-form" novalidate>
+
+        <div class="section-title">🎨 Identidad Visual</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="primary_color">Color Primario</label>
+            <div class="color-input-wrap">
+              <input type="color" formControlName="primary_color" id="primary_color">
+              <input type="text" [value]="configForm.get('primary_color')?.value" readonly placeholder="#18222e">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="secondary_color">Color Secundario</label>
+            <div class="color-input-wrap">
+              <input type="color" formControlName="secondary_color" id="secondary_color">
+              <input type="text" [value]="configForm.get('secondary_color')?.value" readonly placeholder="#bf9f62">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">📞 Información de Contacto</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact_email">Correo electrónico</label>
+            <input type="email" formControlName="contact_email" id="contact_email" placeholder="info@funeraria.com">
+          </div>
+          <div class="form-group">
+            <label for="whatsapp_number">WhatsApp (con código de país)</label>
+            <input type="text" formControlName="whatsapp_number" id="whatsapp_number" placeholder="573001234567">
+          </div>
+        </div>
+
+        <div class="section-title">🏦 Información Bancaria</div>
+        <div class="form-group">
+          <label for="bank_accounts">Datos bancarios para pagos</label>
+          <textarea formControlName="bank_accounts" id="bank_accounts" rows="4"
+            placeholder="Banco XYZ, Cuenta Corriente #123456, Titular: Funeraria S.A.S."></textarea>
+        </div>
+
+        <div class="success-banner" *ngIf="successMsg">✅ {{ successMsg }}</div>
+        <div class="error-banner" *ngIf="errorMsg">⚠️ {{ errorMsg }}</div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-save" [disabled]="saving || configForm.invalid" id="save-config-btn">
+            {{ saving ? 'Guardando...' : 'Guardar Configuración' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

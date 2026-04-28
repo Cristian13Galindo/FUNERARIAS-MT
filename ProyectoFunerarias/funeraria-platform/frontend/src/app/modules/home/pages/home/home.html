@@ -1,0 +1,123 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a routerLink="/home" class="brand" id="nav-brand">
+      <!-- Logo dinámico del tenant -->
+      <img *ngIf="tenant?.logo_url"
+           [src]="tenant.logo_url"
+           [alt]="tenant?.name"
+           class="tenant-logo"
+           id="tenant-logo-img" />
+      <span *ngIf="!tenant?.logo_url">🕊️</span>
+      <span>{{ tenant?.name || 'Plataforma Funeraria' }}</span>
+    </a>
+    <ul class="nav-links">
+      <li><a routerLink="/home" routerLinkActive="active" id="nav-home">Inicio</a></li>
+      <li><a routerLink="/catalog" routerLinkActive="active" id="nav-catalog">Catálogo</a></li>
+      <li><a routerLink="/contact" routerLinkActive="active" id="nav-contact">Contacto</a></li>
+      <li><a routerLink="/login" class="btn-nav" id="nav-login">Admin</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Servicios Funerarios</div>
+    <h1 class="hero-title">
+      <span *ngIf="tenant">{{ tenant.name }}</span>
+      <span *ngIf="!tenant">Acompañamos en cada momento</span>
+    </h1>
+    <p class="hero-subtitle">
+      Con dignidad, respeto y amor, le acompañamos en los momentos más difíciles.<br>
+      Servicios funerarios con atención personalizada 24 horas.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/catalog" class="btn-hero" id="hero-catalog-btn">Ver Catálogo</a>
+      <a routerLink="/contact" class="btn-hero-outline" id="hero-contact-btn">Contáctenos</a>
+    </div>
+  </div>
+  <div class="hero-decoration">
+    <div class="circle-1"></div>
+    <div class="circle-2"></div>
+    <div class="circle-3"></div>
+  </div>
+</section>
+
+<section class="features-section">
+  <div class="section-container">
+    <h2 class="section-title">Nuestros Servicios</h2>
+    <div class="features-grid">
+      <div class="feature-card" id="feature-1">
+        <span class="feature-icon">🌹</span>
+        <h3>Arreglos Florales</h3>
+        <p>Coronas, ramos y arreglos especiales elaborados con flores frescas de alta calidad.</p>
+      </div>
+      <div class="feature-card" id="feature-2">
+        <span class="feature-icon">⚱️</span>
+        <h3>Ataúdes</h3>
+        <p>Amplia selección de féretros en distintos materiales y estilos para cada necesidad.</p>
+      </div>
+      <div class="feature-card" id="feature-3">
+        <span class="feature-icon">📋</span>
+        <h3>Gestión Integral</h3>
+        <p>Nos encargamos de todos los trámites y documentos necesarios.</p>
+      </div>
+      <div class="feature-card" id="feature-4">
+        <span class="feature-icon">🕐</span>
+        <h3>Atención 24/7</h3>
+        <p>Disponibles en todo momento para atender su llamado con respeto y celeridad.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="products-preview" *ngIf="featuredProducts.length > 0">
+  <div class="section-container">
+    <h2 class="section-title">Productos Destacados</h2>
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let product of featuredProducts; let i = index" [id]="'product-' + i">
+        <div class="product-image-placeholder">
+          <span>{{ product.type === 'flower' ? '🌹' : '⚱️' }}</span>
+        </div>
+        <div class="product-info">
+          <span class="product-badge">{{ product.type === 'flower' ? 'Floral' : 'Féretro' }}</span>
+          <h3>{{ product.title }}</h3>
+          <p>{{ product.description }}</p>
+          <span class="product-price" *ngIf="product.price">
+            ${{ product.price | number:'1.0-0' }} COP
+          </span>
+          <span class="product-price consult" *ngIf="!product.price">Consultar precio</span>
+        </div>
+      </div>
+    </div>
+    <div class="section-cta">
+      <a routerLink="/catalog" class="btn-hero" id="see-all-products-btn">Ver catálogo completo</a>
+    </div>
+  </div>
+</section>
+
+<section class="contact-bar" *ngIf="tenant">
+  <div class="contact-content">
+    <span>¿Necesita ayuda inmediata?</span>
+    <a *ngIf="tenant.whatsapp_number"
+       [href]="'https://wa.me/' + tenant.whatsapp_number"
+       target="_blank"
+       class="btn-whatsapp"
+       id="whatsapp-btn">
+      💬 WhatsApp
+    </a>
+    <a *ngIf="tenant.contact_email"
+       [href]="'mailto:' + tenant.contact_email"
+       class="btn-email"
+       id="email-btn">
+      ✉️ {{ tenant.contact_email }}
+    </a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-content">
+    <span *ngIf="tenant">© {{ tenant.name }} · Todos los derechos reservados</span>
+    <span *ngIf="!tenant">© Plataforma Funeraria</span>
+  </div>
+</footer>

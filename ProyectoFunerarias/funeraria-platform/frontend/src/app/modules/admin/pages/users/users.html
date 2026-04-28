@@ -1,0 +1,97 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span>🕊️</span><span class="brand-text">Admin Panel</span></div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active">📊 Dashboard</a>
+      <a routerLink="/admin/products" routerLinkActive="active">📦 Productos</a>
+      <a routerLink="/admin/users" routerLinkActive="active">👥 Usuarios</a>
+      <a routerLink="/admin/config" routerLinkActive="active">⚙️ Configuración</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Gestión de Usuarios</h1>
+      <p>Administre los operarios del sistema</p>
+      <button id="add-user-btn" class="btn-add" (click)="openCreate()">+ Nuevo Usuario</button>
+    </div>
+
+    <!-- Form Modal -->
+    <div class="modal-overlay" *ngIf="showForm" (click)="cancelForm()">
+      <div class="modal-card" (click)="$event.stopPropagation()" id="user-form-modal">
+        <h2>Crear Usuario</h2>
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" formControlName="first_name" placeholder="Nombre" id="user-first-name">
+            </div>
+            <div class="form-group">
+              <label>Apellido *</label>
+              <input type="text" formControlName="last_name" placeholder="Apellido" id="user-last-name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Correo *</label>
+            <input type="email" formControlName="email" placeholder="correo@funeraria.com" id="user-email">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Contraseña *</label>
+              <input type="password" formControlName="password" placeholder="Mín. 6 caracteres" id="user-password">
+            </div>
+            <div class="form-group">
+              <label>Rol</label>
+              <select formControlName="role" id="user-role">
+                <option value="operario">Operario</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+          </div>
+          <div class="error-banner" *ngIf="errorMsg">⚠️ {{ errorMsg }}</div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelForm()">Cancelar</button>
+            <button type="submit" class="btn-save" [disabled]="saving || userForm.invalid" id="save-user-btn">
+              {{ saving ? 'Guardando...' : 'Crear Usuario' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner-circle"></div><span>Cargando...</span>
+    </div>
+
+    <div class="table-card" *ngIf="!loading">
+      <table class="data-table" id="users-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Creado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users; let i = index" [id]="'user-row-' + i">
+            <td class="user-name-cell">
+              <div class="avatar">{{ u.first_name?.charAt(0) || '?' }}</div>
+              {{ u.first_name }} {{ u.last_name }}
+            </td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="role-badge" [class.admin-role]="u.role === 'admin'">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>{{ u.created_at | date:'dd/MM/yyyy' }}</td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="4" class="empty-row">No hay usuarios registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
