@@ -42,7 +42,7 @@ def create_keycloak_user(admin_token, email, password, role):
     }
 
     # 1. Crear usuario
-    username = email.split("@")[0]
+    username = email
     user_payload = {
         "username": username,
         "email": email,
