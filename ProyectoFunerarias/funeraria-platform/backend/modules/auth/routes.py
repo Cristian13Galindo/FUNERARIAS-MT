@@ -71,6 +71,9 @@ def login():
     # Obtener el keycloak_id para validar tenant
     user_info = kc.verify_token(tokens['access_token'])
     keycloak_id = user_info.get('sub')
+
+    print(f"DEBUG keycloak_id: {keycloak_id}", flush=True)
+    print(f"DEBUG tenant_id: {tenant['_id']}", flush=True)
     
     user = db.users.find_one({"keycloak_id": keycloak_id, "tenant_id": tenant['_id']})
     if not user:

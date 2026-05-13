@@ -1,23 +1,101 @@
 """
-Script para poblar datos iniciales en MongoDB.
-Ejecutar después de levantar los contenedores:
+Script para poblar datos iniciales en MongoDB y crear usuarios en Keycloak.
+Ejecutar después de levantar los contenedores y configurar Keycloak:
   docker exec -it funeraria_backend python seed.py
 """
 from pymongo import MongoClient
 from datetime import datetime
+import requests
 import bcrypt
+import time
 
 MONGO_URI = "mongodb://mongodb:27017/funeraria_db"
+KEYCLOAK_BASE = "http://keycloak:8080"
+REALM = "funeraria-realm"
+CLIENT_ID = "funeraria-client"
+CLIENT_SECRET = "funeraria-client-secret"
+
 client = MongoClient(MONGO_URI)
 db = client.get_default_database()
 
-# Limpiar colecciones existentes (opcional, comentar si no se desea)
+# ------------------------------------------------------------
+# Funciones auxiliares para Keycloak
+# ------------------------------------------------------------
+def get_keycloak_admin_token():
+    """Obtiene un token de administrador en el master realm."""
+    url = f"{KEYCLOAK_BASE}/realms/master/protocol/openid-connect/token"
+    payload = {
+        "client_id": "admin-cli",
+        "username": "admin",
+        "password": "admin",
+        "grant_type": "password"
+    }
+    resp = requests.post(url, data=payload)
+    resp.raise_for_status()
+    return resp.json()["access_token"]
+
+def create_keycloak_user(admin_token, email, password, role):
+    """Crea un usuario en el realm funeraria-realm y le asigna el rol indicado."""
+    headers = {
+        "Authorization": f"Bearer {admin_token}",
+        "Content-Type": "application/json"
+    }
+
+    # 1. Crear usuario
+    username = email.split("@")[0]
+    user_payload = {
+        "username": username,
+        "email": email,
+        "credentials": [{"type": "password", "value": password, "temporary": False}],
+        "enabled": True
+    }
+    resp = requests.post(
+        f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users",
+        json=user_payload,
+        headers=headers
+    )
+    if resp.status_code != 201:
+        print(f"ERROR al crear usuario {email}: {resp.status_code} {resp.text}")
+        return None
+
+    user_id = resp.headers["Location"].split("/")[-1]
+
+    # 2. Obtener representación del rol
+    role_resp = requests.get(
+        f"{KEYCLOAK_BASE}/admin/realms/{REALM}/roles/{role}",
+        headers=headers
+    )
+    if role_resp.status_code != 200:
+        print(f"ERROR al obtener rol {role}: {role_resp.status_code} {role_resp.text}")
+        return None
+
+    role_data = role_resp.json()
+
+    # 3. Asignar rol al usuario
+    assign_url = f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users/{user_id}/role-mappings/realm"
+    assign_resp = requests.post(assign_url, json=[role_data], headers=headers)
+    if assign_resp.status_code == 204:
+        print(f"Usuario {email} creado con rol {role} (ID: {user_id})")
+        return user_id
+    else:
+        print(f"ERROR al asignar rol a {email}: {assign_resp.status_code} {assign_resp.text}")
+        return None
+
+# ------------------------------------------------------------
+# Limpiar colecciones existentes
+# ------------------------------------------------------------
 db.tenants.delete_many({})
 db.users.delete_many({})
 db.products.delete_many({})
 db.contacts.delete_many({})
 
-# Crear Tenant 1: La Eternidad
+# ------------------------------------------------------------
+# Crear tenants y usuarios en Keycloak + MongoDB
+# ------------------------------------------------------------
+admin_token = get_keycloak_admin_token()
+print("Token de administrador de Keycloak obtenido.")
+
+# ---- Tenant 1: La Eternidad ----
 tenant1 = {
     "name": "Casa Funeraria La Eternidad",
     "slug": "eternidad",
@@ -33,7 +111,23 @@ tenant1 = {
 result1 = db.tenants.insert_one(tenant1)
 tenant1_id = result1.inserted_id
 
-# Crear Tenant 2: Funeraria Ejemplo
+# Crear admin en Keycloak y guardar en Mongo
+kc_id = create_keycloak_user(admin_token, "admin@eternidad.com", "admin123", "admin")
+if kc_id:
+    user1 = {
+        "keycloak_id": kc_id,
+        "email": "admin@eternidad.com",
+        "password_hash": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode(),
+        "role": "admin",
+        "tenant_id": tenant1_id,
+        "first_name": "Rigoberto",
+        "last_name": "Murcia",
+        "created_at": datetime.utcnow()
+    }
+    db.users.insert_one(user1)
+    print("Admin de Eternidad insertado en MongoDB.")
+
+# ---- Tenant 2: Funeraria Ejemplo ----
 tenant2 = {
     "name": "Funeraria Ejemplo",
     "slug": "ejemplo",
@@ -49,33 +143,22 @@ tenant2 = {
 result2 = db.tenants.insert_one(tenant2)
 tenant2_id = result2.inserted_id
 
-# Crear usuarios admin para cada tenant
-def hash_password(password):
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+kc_id2 = create_keycloak_user(admin_token, "admin@ejemplo.com", "admin123", "admin")
+if kc_id2:
+    user2 = {
+        "keycloak_id": kc_id2,
+        "email": "admin@ejemplo.com",
+        "password_hash": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode(),
+        "role": "admin",
+        "tenant_id": tenant2_id,
+        "first_name": "Admin",
+        "last_name": "Ejemplo",
+        "created_at": datetime.utcnow()
+    }
+    db.users.insert_one(user2)
+    print("Admin de Ejemplo insertado en MongoDB.")
 
-admin1 = {
-    "email": "admin@eternidad.com",
-    "password_hash": hash_password("admin123"),
-    "role": "admin",
-    "tenant_id": tenant1_id,
-    "first_name": "Rigoberto",
-    "last_name": "Murcia",
-    "created_at": datetime.utcnow()
-}
-db.users.insert_one(admin1)
-
-admin2 = {
-    "email": "admin@ejemplo.com",
-    "password_hash": hash_password("admin123"),
-    "role": "admin",
-    "tenant_id": tenant2_id,
-    "first_name": "Admin",
-    "last_name": "Ejemplo",
-    "created_at": datetime.utcnow()
-}
-db.users.insert_one(admin2)
-
-# Crear algunos productos de ejemplo para cada tenant
+# ---- Productos de ejemplo ----
 product1_1 = {
     "tenant_id": tenant1_id,
     "type": "flower",
@@ -92,7 +175,7 @@ product1_2 = {
     "tenant_id": tenant1_id,
     "type": "coffin",
     "title": "Ataúd Clásico en Madera de Cedro",
-    "description": "Ataúd elaborado en madera de cedro con acabados en dorado. Diseño sobrio y elegante.",
+    "description": "Ataúd elaborado en madera de cedro con acabados en dorado.",
     "price": None,
     "image_url": None,
     "is_visible": True,
@@ -124,9 +207,9 @@ product2_2 = {
 }
 db.products.insert_one(product2_2)
 
-print("✅ Datos de prueba insertados correctamente.")
-print(f"   - Tenant 1: 'eternidad' con admin admin@eternidad.com / admin123")
-print(f"   - Tenant 2: 'ejemplo' con admin admin@ejemplo.com / admin123")
-print(f"   - Productos de ejemplo creados para cada tenant.")
+print("\n✅ Datos de prueba insertados correctamente.")
+print("   - Tenant 1: 'eternidad' con admin admin@eternidad.com / admin123")
+print("   - Tenant 2: 'ejemplo' con admin admin@ejemplo.com / admin123")
+print("   - Productos de ejemplo creados para cada tenant.")
 
 client.close()

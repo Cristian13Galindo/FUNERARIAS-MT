@@ -83,7 +83,8 @@ class KeycloakClient:
             'grant_type': 'password',
             'client_id': self.client_id,
             'username': email,
-            'password': password
+            'password': password,
+            'scope': 'openid profile email'
         }
         if self.client_secret:
             payload['client_secret'] = self.client_secret
