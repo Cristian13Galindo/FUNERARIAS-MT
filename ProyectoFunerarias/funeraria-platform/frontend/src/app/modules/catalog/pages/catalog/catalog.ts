@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CatalogService } from '../../../../core/services/catalog';
@@ -20,7 +20,8 @@ export class Catalog implements OnInit {
 
   constructor(
     private catalogService: CatalogService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -29,8 +30,13 @@ export class Catalog implements OnInit {
 
     // Cargar y aplicar el tema del tenant
     this.tenantService.getConfig(this.tenantSlug).subscribe({
-      next: (config) => this.tenantService.applyTheme(config),
-      error: () => {}
+      next: (config) => {
+        this.tenantService.applyTheme(config);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cdr.detectChanges();
+      }
     });
 
     // Cargar catálogo de productos
@@ -39,8 +45,12 @@ export class Catalog implements OnInit {
         this.products = products;
         this.filtered = products;
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => (this.loading = false)
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -49,6 +59,9 @@ export class Catalog implements OnInit {
     this.filtered = type === 'all'
       ? this.products
       : this.products.filter(p => p.type === type);
+    this.cdr.detectChanges();
   }
 }
+
+
 

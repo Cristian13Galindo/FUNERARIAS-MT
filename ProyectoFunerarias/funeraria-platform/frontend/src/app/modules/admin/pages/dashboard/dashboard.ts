@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
@@ -20,7 +20,8 @@ export class Dashboard implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private catalogService: CatalogService
+    private catalogService: CatalogService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -31,8 +32,12 @@ export class Dashboard implements OnInit {
         this.flowers = products.filter(p => p.type === 'flower').length;
         this.coffins = products.filter(p => p.type === 'coffin').length;
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => (this.loading = false)
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -40,3 +45,5 @@ export class Dashboard implements OnInit {
     this.authService.logout();
   }
 }
+
+

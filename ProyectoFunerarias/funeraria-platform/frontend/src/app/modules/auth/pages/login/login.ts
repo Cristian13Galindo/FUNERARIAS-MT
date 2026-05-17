@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -19,7 +19,8 @@ export class Login implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,16 +38,21 @@ export class Login implements OnInit {
     if (this.loginForm.invalid) return;
     this.loading = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
     const { email, password, tenant_slug } = this.loginForm.value;
     this.authService.login(email, password, tenant_slug).subscribe({
       next: () => {
         this.loading = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/admin/dashboard']);
       },
       error: (err) => {
         this.loading = false;
         this.errorMsg = err.error?.msg ?? 'Error al iniciar sesión';
+        this.cdr.detectChanges();
       }
     });
   }
 }
+
+

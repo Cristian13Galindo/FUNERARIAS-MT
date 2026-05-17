@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -20,7 +20,11 @@ export class Users implements OnInit {
   saving = false;
   errorMsg = '';
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {}
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -40,8 +44,15 @@ export class Users implements OnInit {
   loadUsers(): void {
     this.loading = true;
     this.http.get<any[]>(`${environment.apiUrl}/admin/users/`).subscribe({
-      next: (u) => { this.users = u; this.loading = false; },
-      error: () => (this.loading = false)
+      next: (u) => {
+        this.users = u;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -49,25 +60,32 @@ export class Users implements OnInit {
     this.buildForm();
     this.showForm = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
   }
 
   cancelForm(): void {
     this.showForm = false;
+    this.cdr.detectChanges();
   }
 
   saveUser(): void {
     if (this.userForm.invalid) return;
     this.saving = true;
+    this.cdr.detectChanges();
     this.http.post(`${environment.apiUrl}/admin/users/`, this.userForm.value).subscribe({
       next: () => {
         this.saving = false;
         this.showForm = false;
+        this.cdr.detectChanges();
         this.loadUsers();
       },
       error: (err) => {
         this.saving = false;
         this.errorMsg = err.error?.msg ?? 'Error al crear usuario';
+        this.cdr.detectChanges();
       }
     });
   }
 }
+
+

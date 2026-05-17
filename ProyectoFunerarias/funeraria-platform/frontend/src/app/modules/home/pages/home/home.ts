@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TenantService } from '../../../../core/services/tenant';
@@ -18,7 +18,8 @@ export class Home implements OnInit {
 
   constructor(
     private tenantService: TenantService,
-    private catalogService: CatalogService
+    private catalogService: CatalogService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -30,14 +31,24 @@ export class Home implements OnInit {
         this.tenant = data;
         // Aplica colores del tenant como CSS custom properties globales
         this.tenantService.applyTheme(data);
+        this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {
+        this.cdr.detectChanges();
+      }
     });
 
     this.catalogService.getCatalog(this.tenantSlug).subscribe({
-      next: (products) => (this.featuredProducts = products.slice(0, 4)),
-      error: () => {}
+      next: (products) => {
+        this.featuredProducts = products.slice(0, 4);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cdr.detectChanges();
+      }
     });
   }
 }
+
+
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -20,7 +20,11 @@ export class Products implements OnInit {
   saving = false;
   errorMsg = '';
 
-  constructor(private catalogService: CatalogService, private fb: FormBuilder) {}
+  constructor(
+    private catalogService: CatalogService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -40,8 +44,15 @@ export class Products implements OnInit {
   loadProducts(): void {
     this.loading = true;
     this.catalogService.listProducts().subscribe({
-      next: (p) => { this.products = p; this.loading = false; },
-      error: () => (this.loading = false)
+      next: (p) => {
+        this.products = p;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -50,6 +61,7 @@ export class Products implements OnInit {
     this.buildForm();
     this.showForm = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
   }
 
   openEdit(product: any): void {
@@ -57,16 +69,19 @@ export class Products implements OnInit {
     this.buildForm(product);
     this.showForm = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
   }
 
   cancelForm(): void {
     this.showForm = false;
     this.editingProduct = null;
+    this.cdr.detectChanges();
   }
 
   saveProduct(): void {
     if (this.productForm.invalid) return;
     this.saving = true;
+    this.cdr.detectChanges();
     const data = this.productForm.value;
     const obs = this.editingProduct
       ? this.catalogService.updateProduct(this.editingProduct._id, data)
@@ -76,11 +91,13 @@ export class Products implements OnInit {
       next: () => {
         this.saving = false;
         this.showForm = false;
+        this.cdr.detectChanges();
         this.loadProducts();
       },
       error: (err) => {
         this.saving = false;
         this.errorMsg = err.error?.msg ?? 'Error al guardar';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -88,8 +105,15 @@ export class Products implements OnInit {
   deleteProduct(id: string): void {
     if (!confirm('¿Eliminar este producto?')) return;
     this.catalogService.deleteProduct(id).subscribe({
-      next: () => this.loadProducts(),
-      error: () => alert('Error al eliminar')
+      next: () => {
+        this.loadProducts();
+      },
+      error: () => {
+        alert('Error al eliminar');
+        this.cdr.detectChanges();
+      }
     });
   }
 }
+
+

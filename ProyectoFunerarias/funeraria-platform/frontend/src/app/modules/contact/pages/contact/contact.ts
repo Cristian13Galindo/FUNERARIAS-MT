@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CatalogService } from '../../../../core/services/catalog';
@@ -21,7 +21,8 @@ export class Contact implements OnInit {
   constructor(
     private fb: FormBuilder,
     private catalogService: CatalogService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private cdr: ChangeDetectorRef
   ) {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
@@ -37,8 +38,13 @@ export class Contact implements OnInit {
 
     // Aplicar tema del tenant también en la página de contacto
     this.tenantService.getConfig(this.tenantSlug).subscribe({
-      next: (config) => this.tenantService.applyTheme(config),
-      error: () => {}
+      next: (config) => {
+        this.tenantService.applyTheme(config);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -46,18 +52,23 @@ export class Contact implements OnInit {
     if (this.contactForm.invalid) return;
     this.loading = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
     const payload = { ...this.contactForm.value, tenant_slug: this.tenantSlug };
     this.catalogService.sendContact(payload).subscribe({
       next: () => {
         this.loading = false;
         this.success = true;
         this.contactForm.reset();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
         this.errorMsg = err.error?.msg ?? 'Error al enviar mensaje';
+        this.cdr.detectChanges();
       }
     });
   }
 }
+
+
 

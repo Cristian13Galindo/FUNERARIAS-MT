@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -19,7 +19,11 @@ export class Config implements OnInit {
   successMsg = '';
   errorMsg = '';
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {}
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.configForm = this.fb.group({
@@ -37,8 +41,12 @@ export class Config implements OnInit {
       next: (c) => {
         this.configForm.patchValue(c);
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => (this.loading = false)
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -47,15 +55,20 @@ export class Config implements OnInit {
     this.saving = true;
     this.successMsg = '';
     this.errorMsg = '';
+    this.cdr.detectChanges();
     this.http.put(`${environment.apiUrl}/admin/config/`, this.configForm.value).subscribe({
       next: () => {
         this.saving = false;
         this.successMsg = 'Configuración guardada correctamente';
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.saving = false;
         this.errorMsg = err.error?.msg ?? 'Error al guardar';
+        this.cdr.detectChanges();
       }
     });
   }
 }
+
+
