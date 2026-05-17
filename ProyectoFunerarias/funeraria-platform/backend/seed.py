@@ -54,11 +54,29 @@ def create_keycloak_user(admin_token, email, password, role):
         json=user_payload,
         headers=headers
     )
-    if resp.status_code != 201:
+    if resp.status_code == 201:
+        user_id = resp.headers["Location"].split("/")[-1]
+    elif resp.status_code == 409 or "User exists" in resp.text:
+        print(f"Usuario {email} ya existe en Keycloak. Obteniendo su ID...")
+        get_resp = requests.get(
+            f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users?username={username}",
+            headers=headers
+        )
+        if get_resp.status_code == 200 and len(get_resp.json()) > 0:
+            user_id = get_resp.json()[0]["id"]
+            
+            # (Opcional) Actualizar la contraseña para asegurar que sea admin123
+            requests.put(
+                f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users/{user_id}/reset-password",
+                json={"type": "password", "value": password, "temporary": False},
+                headers=headers
+            )
+        else:
+            print(f"ERROR al obtener usuario existente {email}: {get_resp.status_code}")
+            return None
+    else:
         print(f"ERROR al crear usuario {email}: {resp.status_code} {resp.text}")
         return None
-
-    user_id = resp.headers["Location"].split("/")[-1]
 
     # 2. Obtener representación del rol
     role_resp = requests.get(

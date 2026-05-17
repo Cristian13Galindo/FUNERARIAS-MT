@@ -23,9 +23,10 @@ def extract_tenant():
                 g.role = user.get('role')
             else:
                 # Si el usuario está en Keycloak pero no en MongoDB (ej. admin recién creado)
-                # Opcional: manejar este caso si es necesario
+                print(f"USER NOT FOUND IN MONGO: {keycloak_id}", flush=True)
                 pass
         except Exception as e:
             # Token inválido o no existe, simplemente continuamos sin popular `g`
             # Las rutas protegidas lo validarán después
+            print(f"AUTH EXCEPTION: {e}. Token recibido: {auth_header}", flush=True)
             pass

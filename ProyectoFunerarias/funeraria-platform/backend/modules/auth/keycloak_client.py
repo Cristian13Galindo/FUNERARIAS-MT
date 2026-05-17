@@ -107,16 +107,21 @@ class KeycloakClient:
         requests.post(url, data=payload)
 
     def verify_token(self, token):
-        # We will use the userinfo endpoint for simplicity and robustness instead of local signature validation
-        # since we don't fetch public keys dynamically here.
-        user_info = self.get_user_info(token)
-        return user_info
+        # We decode the token locally to extract user_id (sub) without hitting Keycloak again.
+        # This avoids network issues and speeds up the request.
+        try:
+            payload = jwt.get_unverified_claims(token)
+            return payload
+        except Exception as e:
+            print(f"JWT DECODE ERROR: {e}", flush=True)
+            raise Exception("Token inválido")
         
     def get_user_info(self, token):
         url = f"{self.base_url}/protocol/openid-connect/userinfo"
         headers = {'Authorization': f'Bearer {token}'}
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
+            print(f"USERINFO FAILED: {response.status_code} - {response.text}", flush=True)
             raise Exception("Token inválido o expirado")
         return response.json()
 

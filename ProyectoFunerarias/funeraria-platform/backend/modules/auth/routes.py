@@ -72,13 +72,20 @@ def login():
     user_info = kc.verify_token(tokens['access_token'])
     keycloak_id = user_info.get('sub')
 
-    print(f"DEBUG keycloak_id: {keycloak_id}", flush=True)
-    print(f"DEBUG tenant_id: {tenant['_id']}", flush=True)
-    
-    user = db.users.find_one({"keycloak_id": keycloak_id, "tenant_id": tenant['_id']})
+    user = db.users.find_one({"email": email, "tenant_id": tenant['_id']})
     if not user:
-        # El usuario existe en KC pero no pertenece a este tenant
-        return jsonify({"msg": "Usuario no autorizado para esta funeraria"}), 403
+        # Check if the user exists at all in the database (maybe under a different tenant)
+        user_any = db.users.find_one({"email": email})
+        if user_any:
+            return jsonify({"msg": "Usuario no autorizado para esta funeraria"}), 403
+        else:
+            # If the user is in KC but not in Mongo, they shouldn't be able to login here
+            return jsonify({"msg": "Usuario no encontrado en la base de datos"}), 404
+
+    # Auto-heal the keycloak_id if it's different or missing
+    if user.get("keycloak_id") != keycloak_id:
+        db.users.update_one({"_id": user['_id']}, {"$set": {"keycloak_id": keycloak_id}})
+
 
     producer = get_producer()
     if producer:
