@@ -8,7 +8,7 @@ export class CatalogService {
   private readonly publicAPI = `${environment.apiUrl}/public`;
   private readonly adminAPI = `${environment.apiUrl}/admin/products`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ── Public endpoints ──────────────────────────────────────────────────────
   getCatalog(tenantSlug: string, type?: string): Observable<any[]> {
