@@ -34,7 +34,7 @@ def get_keycloak_admin_token():
     resp.raise_for_status()
     return resp.json()["access_token"]
 
-def create_keycloak_user(admin_token, email, password, role):
+def create_keycloak_user(admin_token, email, password, role, first_name="", last_name=""):
     """Crea un usuario en el realm funeraria-realm y le asigna el rol indicado."""
     headers = {
         "Authorization": f"Bearer {admin_token}",
@@ -46,8 +46,11 @@ def create_keycloak_user(admin_token, email, password, role):
     user_payload = {
         "username": username,
         "email": email,
+        "firstName": first_name,
+        "lastName": last_name,
         "credentials": [{"type": "password", "value": password, "temporary": False}],
-        "enabled": True
+        "enabled": True,
+        "emailVerified": True
     }
     resp = requests.post(
         f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users",
@@ -57,20 +60,32 @@ def create_keycloak_user(admin_token, email, password, role):
     if resp.status_code == 201:
         user_id = resp.headers["Location"].split("/")[-1]
     elif resp.status_code == 409 or "User exists" in resp.text:
-        print(f"Usuario {email} ya existe en Keycloak. Obteniendo su ID...")
+        print(f"Usuario {email} ya existe en Keycloak. Eliminando versión anterior para recrearlo limpio...")
         get_resp = requests.get(
             f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users?username={username}",
             headers=headers
         )
         if get_resp.status_code == 200 and len(get_resp.json()) > 0:
-            user_id = get_resp.json()[0]["id"]
-            
-            # (Opcional) Actualizar la contraseña para asegurar que sea admin123
-            requests.put(
-                f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users/{user_id}/reset-password",
-                json={"type": "password", "value": password, "temporary": False},
+            old_user_id = get_resp.json()[0]["id"]
+            del_resp = requests.delete(
+                f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users/{old_user_id}",
                 headers=headers
             )
+            if del_resp.status_code not in [200, 204]:
+                print(f"ERROR al eliminar usuario antiguo {email}: {del_resp.status_code} {del_resp.text}")
+                return None
+            
+            # Recrear el usuario limpio
+            resp = requests.post(
+                f"{KEYCLOAK_BASE}/admin/realms/{REALM}/users",
+                json=user_payload,
+                headers=headers
+            )
+            if resp.status_code == 201:
+                user_id = resp.headers["Location"].split("/")[-1]
+            else:
+                print(f"ERROR al recrear usuario {email}: {resp.status_code} {resp.text}")
+                return None
         else:
             print(f"ERROR al obtener usuario existente {email}: {get_resp.status_code}")
             return None
@@ -130,7 +145,7 @@ result1 = db.tenants.insert_one(tenant1)
 tenant1_id = result1.inserted_id
 
 # Crear admin en Keycloak y guardar en Mongo
-kc_id = create_keycloak_user(admin_token, "admin@eternidad.com", "admin123", "admin")
+kc_id = create_keycloak_user(admin_token, "admin@eternidad.com", "admin123", "admin", "Rigoberto", "Murcia")
 if kc_id:
     user1 = {
         "keycloak_id": kc_id,
@@ -161,7 +176,7 @@ tenant2 = {
 result2 = db.tenants.insert_one(tenant2)
 tenant2_id = result2.inserted_id
 
-kc_id2 = create_keycloak_user(admin_token, "admin@ejemplo.com", "admin123", "admin")
+kc_id2 = create_keycloak_user(admin_token, "admin@ejemplo.com", "admin123", "admin", "Admin", "Ejemplo")
 if kc_id2:
     user2 = {
         "keycloak_id": kc_id2,
@@ -175,6 +190,7 @@ if kc_id2:
     }
     db.users.insert_one(user2)
     print("Admin de Ejemplo insertado en MongoDB.")
+
 
 # ---- Productos de ejemplo ----
 product1_1 = {

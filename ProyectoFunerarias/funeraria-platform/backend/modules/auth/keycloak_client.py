@@ -43,6 +43,7 @@ class KeycloakClient:
             "firstName": first_name,
             "lastName": last_name,
             "enabled": True,
+            "emailVerified": True,
             "credentials": [{"type": "password", "value": password, "temporary": False}]
         }
         
