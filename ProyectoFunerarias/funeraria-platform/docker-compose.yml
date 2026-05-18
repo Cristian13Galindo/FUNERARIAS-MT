@@ -99,7 +99,9 @@ services:
       KC_DB_PASSWORD: keycloakpassword
     ports:
       - "8080:8080"
-    command: start-dev
+    volumes:
+      - ./keycloak/seedKey.json:/opt/keycloak/data/import/seedKey.json:ro
+    command: start-dev --import-realm
     depends_on:
       - postgres
     networks:

@@ -20,9 +20,13 @@ def get_tenant_info():
     return jsonify({
         "id": str(tenant['_id']),
         "name": tenant['name'],
+        "slug": tenant.get('slug'),
         "logo_url": tenant.get('logo_url'),
         "primary_color": tenant.get('primary_color', '#000000'),
         "secondary_color": tenant.get('secondary_color', '#ffffff'),
+        "accent_color": tenant.get('accent_color', '#ffffff'),
+        "background_color": tenant.get('background_color', '#0d1117'),
+        "text_color": tenant.get('text_color', '#e0e3e8'),
         "contact_email": tenant.get('contact_email'),
         "whatsapp_number": tenant.get('whatsapp_number'),
         "bank_accounts": tenant.get('bank_accounts')

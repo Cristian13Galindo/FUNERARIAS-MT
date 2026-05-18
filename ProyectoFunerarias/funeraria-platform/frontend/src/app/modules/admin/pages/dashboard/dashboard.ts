@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
 import { CatalogService } from '../../../../core/services/catalog';
+import { TenantService } from '../../../../core/services/tenant';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,11 +22,16 @@ export class Dashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private catalogService: CatalogService,
+    private tenantService: TenantService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.user = this.authService.getCurrentUser();
+    const slug = this.tenantService.resolveSlug();
+    this.tenantService.getConfig(slug).subscribe({
+      next: (config: any) => this.tenantService.applyTheme(config)
+    });
     this.catalogService.listProducts().subscribe({
       next: (products) => {
         this.totalProducts = products.length;

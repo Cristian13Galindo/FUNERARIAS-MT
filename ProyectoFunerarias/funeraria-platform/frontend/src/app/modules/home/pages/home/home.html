@@ -2,12 +2,13 @@
   <div class="nav-container">
     <a routerLink="/home" class="brand" id="nav-brand">
       <!-- Logo dinámico del tenant -->
-      <img *ngIf="tenant?.logo_url"
+      <img *ngIf="tenant?.logo_url && !logoFailed"
            [src]="tenant.logo_url"
            [alt]="tenant?.name"
            class="tenant-logo"
-           id="tenant-logo-img" />
-      <span *ngIf="!tenant?.logo_url">🕊️</span>
+           id="tenant-logo-img"
+           (error)="onLogoError()" />
+      <span *ngIf="!tenant?.logo_url || logoFailed">🕊️</span>
       <span>{{ tenant?.name || 'Plataforma Funeraria' }}</span>
     </a>
     <ul class="nav-links">

@@ -2,8 +2,11 @@
 
 /* ── CSS Custom Properties (sobreescritas dinámicamente por TenantService.applyTheme) ── */
 :root {
-  --primary-color:   #18222e;   /* default: oscuro */
-  --secondary-color: #bf9f62;   /* default: dorado */
+  --primary-color:    #18222e;   /* default: oscuro (Eternidad) */
+  --secondary-color:  #bf9f62;   /* default: dorado */
+  --accent-color:     #ccad52;   /* default: dorado claro */
+  --background-color: #0d1117;   /* default: fondo oscuro */
+  --text-color:       #e0e3e8;   /* default: texto claro */
 }
 
 
@@ -21,8 +24,8 @@ html {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #0d1117;
-  color: rgba(255, 255, 255, 0.85);
+  background-color: var(--background-color);
+  color: var(--text-color);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -30,13 +33,13 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0d1117; }
-::-webkit-scrollbar-thumb { background: rgba(191,159,98,0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(191,159,98,0.5); }
+::-webkit-scrollbar-track { background: var(--background-color); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--secondary-color) 30%, transparent); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--secondary-color) 50%, transparent); }
 
 /* Selection */
 ::selection {
-  background: rgba(191,159,98,0.25);
+  background: color-mix(in srgb, var(--secondary-color) 25%, transparent);
   color: #fff;
 }
 

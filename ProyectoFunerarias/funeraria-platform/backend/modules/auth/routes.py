@@ -52,35 +52,45 @@ def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
-    tenant_slug = data.get('tenant_slug')
+    tenant_slug = data.get('tenant_slug')  # ahora es opcional
 
-    if not email or not password or not tenant_slug:
-        return jsonify({"msg": "Email, contraseña y slug son obligatorios"}), 400
+    if not email or not password:
+        return jsonify({"msg": "Email y contraseña son obligatorios"}), 400
 
     db = Database.get_db()
-    tenant = db.tenants.find_one({"slug": tenant_slug})
-    if not tenant:
-        return jsonify({"msg": "Funeraria no encontrada"}), 404
 
+    # Autenticar contra Keycloak primero
     kc = get_keycloak_client()
     try:
         tokens = kc.login(email, password)
     except Exception as e:
         return jsonify({"msg": str(e)}), 401
 
-    # Obtener el keycloak_id para validar tenant
+    # Obtener el keycloak_id para validar
     user_info = kc.verify_token(tokens['access_token'])
     keycloak_id = user_info.get('sub')
 
-    user = db.users.find_one({"email": email, "tenant_id": tenant['_id']})
-    if not user:
-        # Check if the user exists at all in the database (maybe under a different tenant)
-        user_any = db.users.find_one({"email": email})
-        if user_any:
-            return jsonify({"msg": "Usuario no autorizado para esta funeraria"}), 403
-        else:
-            # If the user is in KC but not in Mongo, they shouldn't be able to login here
+    if tenant_slug:
+        # Flujo original: buscar por email + tenant
+        tenant = db.tenants.find_one({"slug": tenant_slug})
+        if not tenant:
+            return jsonify({"msg": "Funeraria no encontrada"}), 404
+        user = db.users.find_one({"email": email, "tenant_id": tenant['_id']})
+        if not user:
+            user_any = db.users.find_one({"email": email})
+            if user_any:
+                return jsonify({"msg": "Usuario no autorizado para esta funeraria"}), 403
+            else:
+                return jsonify({"msg": "Usuario no encontrado en la base de datos"}), 404
+    else:
+        # Flujo nuevo: buscar solo por email y derivar tenant automáticamente
+        user = db.users.find_one({"email": email})
+        if not user:
             return jsonify({"msg": "Usuario no encontrado en la base de datos"}), 404
+        tenant = db.tenants.find_one({"_id": user['tenant_id']})
+        if not tenant:
+            return jsonify({"msg": "Funeraria asociada no encontrada"}), 404
+        tenant_slug = tenant['slug']
 
     # Auto-heal the keycloak_id if it's different or missing
     if user.get("keycloak_id") != keycloak_id:
@@ -94,6 +104,7 @@ def login():
     return jsonify({
         "access_token": tokens['access_token'],
         "refresh_token": tokens.get('refresh_token'),
+        "tenant_slug": tenant_slug,
         "user": {
             "id": str(user['_id']),
             "email": user['email'],

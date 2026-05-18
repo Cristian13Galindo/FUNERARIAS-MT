@@ -15,12 +15,18 @@ export class Home implements OnInit {
   tenant: any = null;
   featuredProducts: any[] = [];
   tenantSlug = '';
+  logoFailed = false;
 
   constructor(
     private tenantService: TenantService,
     private catalogService: CatalogService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  onLogoError(): void {
+    this.logoFailed = true;
+    this.cdr.detectChanges();
+  }
 
   ngOnInit(): void {
     // Resolución dinámica del slug (hostname → localStorage → query → fallback)

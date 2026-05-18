@@ -9,20 +9,6 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" id="login-form" novalidate>
 
       <div class="form-group">
-        <label for="tenant_slug">Identificador de Funeraria</label>
-        <input
-          id="tenant_slug"
-          type="text"
-          formControlName="tenant_slug"
-          placeholder="ej: eternidad"
-          autocomplete="organization"
-        />
-        <span class="field-error" *ngIf="loginForm.get('tenant_slug')?.invalid && loginForm.get('tenant_slug')?.touched">
-          Campo obligatorio
-        </span>
-      </div>
-
-      <div class="form-group">
         <label for="email">Correo electrónico</label>
         <input
           id="email"

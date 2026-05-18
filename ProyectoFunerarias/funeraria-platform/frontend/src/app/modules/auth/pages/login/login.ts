@@ -28,7 +28,6 @@ export class Login implements OnInit {
       this.router.navigate(['/admin']);
     }
     this.loginForm = this.fb.group({
-      tenant_slug: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -39,8 +38,8 @@ export class Login implements OnInit {
     this.loading = true;
     this.errorMsg = '';
     this.cdr.detectChanges();
-    const { email, password, tenant_slug } = this.loginForm.value;
-    this.authService.login(email, password, tenant_slug).subscribe({
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
       next: () => {
         this.loading = false;
         this.cdr.detectChanges();
@@ -54,5 +53,3 @@ export class Login implements OnInit {
     });
   }
 }
-
-

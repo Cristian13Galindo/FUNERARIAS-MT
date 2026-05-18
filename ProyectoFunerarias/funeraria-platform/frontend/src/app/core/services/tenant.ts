@@ -25,13 +25,30 @@ export class TenantService {
    * Aplica los colores del tenant como CSS custom properties globales.
    * Esto permite que cualquier componente los consuma con var(--primary-color).
    */
-  applyTheme(config: { primary_color?: string; secondary_color?: string; name?: string }): void {
+  applyTheme(config: {
+    primary_color?: string;
+    secondary_color?: string;
+    accent_color?: string;
+    background_color?: string;
+    text_color?: string;
+    name?: string;
+    logo_url?: string;
+  }): void {
     const root = document.documentElement;
     if (config.primary_color) {
       root.style.setProperty('--primary-color', config.primary_color);
     }
     if (config.secondary_color) {
       root.style.setProperty('--secondary-color', config.secondary_color);
+    }
+    if (config.accent_color) {
+      root.style.setProperty('--accent-color', config.accent_color);
+    }
+    if (config.background_color) {
+      root.style.setProperty('--background-color', config.background_color);
+    }
+    if (config.text_color) {
+      root.style.setProperty('--text-color', config.text_color);
     }
     if (config.name) {
       document.title = config.name;
@@ -46,8 +63,9 @@ export class TenantService {
    *  4. Fallback: 'eternidad' (para desarrollo local).
    */
   resolveSlug(): string {
-    const fromStorage = localStorage.getItem('tenant_slug');
-    if (fromStorage) return fromStorage;
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = params.get('tenant');
+    if (fromQuery) return fromQuery;
 
     const hostname = window.location.hostname;
     const parts = hostname.split('.');
@@ -55,11 +73,9 @@ export class TenantService {
       return parts[0];
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const fromQuery = params.get('tenant');
-    if (fromQuery) return fromQuery;
+    const fromStorage = localStorage.getItem('tenant_slug');
+    if (fromStorage) return fromStorage;
 
     return 'eternidad'; // fallback para desarrollo local
   }
 }
-

@@ -132,9 +132,12 @@ print("Token de administrador de Keycloak obtenido.")
 tenant1 = {
     "name": "Casa Funeraria La Eternidad",
     "slug": "eternidad",
-    "logo_url": None,
+    "logo_url": "/assets/logos/logoLaEternidad.png",
     "primary_color": "#18222e",
     "secondary_color": "#bf9f62",
+    "accent_color": "#ccad52",
+    "background_color": "#0d1117",
+    "text_color": "#e0e3e8",
     "contact_email": "funerarialaeternidad@hotmail.com",
     "whatsapp_number": "573132569671",
     "bank_accounts": "Banco Ejemplo, Cuenta #123456",
@@ -144,13 +147,12 @@ tenant1 = {
 result1 = db.tenants.insert_one(tenant1)
 tenant1_id = result1.inserted_id
 
-# Crear admin en Keycloak y guardar en Mongo
-kc_id = create_keycloak_user(admin_token, "admin@eternidad.com", "admin123", "admin", "Rigoberto", "Murcia")
+kc_id = create_keycloak_user(admin_token, "admin@eternidad.com", "admineternidad", "admin", "Rigoberto", "Murcia")
 if kc_id:
     user1 = {
         "keycloak_id": kc_id,
         "email": "admin@eternidad.com",
-        "password_hash": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode(),
+        "password_hash": bcrypt.hashpw("admineternidad".encode(), bcrypt.gensalt()).decode(),
         "role": "admin",
         "tenant_id": tenant1_id,
         "first_name": "Rigoberto",
@@ -160,14 +162,17 @@ if kc_id:
     db.users.insert_one(user1)
     print("Admin de Eternidad insertado en MongoDB.")
 
-# ---- Tenant 2: Funeraria Ejemplo ----
+# ---- Tenant 2: Los Olivos ----
 tenant2 = {
-    "name": "Funeraria Ejemplo",
-    "slug": "ejemplo",
-    "logo_url": None,
-    "primary_color": "#1a1a1a",
-    "secondary_color": "#d4af37",
-    "contact_email": "info@ejemplo.com",
+    "name": "Funeraria Los Olivos",
+    "slug": "losolivos",
+    "logo_url": "/assets/logos/logoLosOlivos.png",
+    "primary_color": "#006338",
+    "secondary_color": "#C6A152",
+    "accent_color": "#D4AF37",
+    "background_color": "#ffffff",
+    "text_color": "#333333",
+    "contact_email": "info@losolivos.com",
     "whatsapp_number": "573001234567",
     "bank_accounts": "Banco Prueba, Cuenta #654321",
     "is_active": True,
@@ -176,24 +181,59 @@ tenant2 = {
 result2 = db.tenants.insert_one(tenant2)
 tenant2_id = result2.inserted_id
 
-kc_id2 = create_keycloak_user(admin_token, "admin@ejemplo.com", "admin123", "admin", "Admin", "Ejemplo")
+kc_id2 = create_keycloak_user(admin_token, "admin@losolivos.com", "adminolivos", "admin", "Admin", "Olivos")
 if kc_id2:
     user2 = {
         "keycloak_id": kc_id2,
-        "email": "admin@ejemplo.com",
-        "password_hash": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode(),
+        "email": "admin@losolivos.com",
+        "password_hash": bcrypt.hashpw("adminolivos".encode(), bcrypt.gensalt()).decode(),
         "role": "admin",
         "tenant_id": tenant2_id,
         "first_name": "Admin",
-        "last_name": "Ejemplo",
+        "last_name": "Olivos",
         "created_at": datetime.utcnow()
     }
     db.users.insert_one(user2)
-    print("Admin de Ejemplo insertado en MongoDB.")
+    print("Admin de Los Olivos insertado en MongoDB.")
+
+# ---- Tenant 3: Funeraria Central ----
+tenant3 = {
+    "name": "Funeraria Central",
+    "slug": "central",
+    "logo_url": "/assets/logos/logoFuneCentral.jpg",
+    "primary_color": "#3b3b3b",
+    "secondary_color": "#c8b27f",
+    "accent_color": "#c8b27f",
+    "background_color": "#f2f2f2",
+    "text_color": "#3b3b3b",
+    "contact_email": "info@funerariacentral.com",
+    "whatsapp_number": "573009876543",
+    "bank_accounts": "Banco Nacional, Cuenta #789012",
+    "is_active": True,
+    "created_at": datetime.utcnow()
+}
+result3 = db.tenants.insert_one(tenant3)
+tenant3_id = result3.inserted_id
+
+kc_id3 = create_keycloak_user(admin_token, "admin@central.com", "admincentral", "admin", "Admin", "Central")
+if kc_id3:
+    user3 = {
+        "keycloak_id": kc_id3,
+        "email": "admin@central.com",
+        "password_hash": bcrypt.hashpw("admincentral".encode(), bcrypt.gensalt()).decode(),
+        "role": "admin",
+        "tenant_id": tenant3_id,
+        "first_name": "Admin",
+        "last_name": "Central",
+        "created_at": datetime.utcnow()
+    }
+    db.users.insert_one(user3)
+    print("Admin de Funeraria Central insertado en MongoDB.")
 
 
 # ---- Productos de ejemplo ----
-product1_1 = {
+# Eternidad
+db.products.insert_one({
     "tenant_id": tenant1_id,
     "type": "flower",
     "title": "Ramo de Rosas Rojas Premium",
@@ -202,10 +242,8 @@ product1_1 = {
     "image_url": None,
     "is_visible": True,
     "created_at": datetime.utcnow()
-}
-db.products.insert_one(product1_1)
-
-product1_2 = {
+})
+db.products.insert_one({
     "tenant_id": tenant1_id,
     "type": "coffin",
     "title": "Ataúd Clásico en Madera de Cedro",
@@ -214,10 +252,10 @@ product1_2 = {
     "image_url": None,
     "is_visible": True,
     "created_at": datetime.utcnow()
-}
-db.products.insert_one(product1_2)
+})
 
-product2_1 = {
+# Los Olivos
+db.products.insert_one({
     "tenant_id": tenant2_id,
     "type": "flower",
     "title": "Corona de Lirios Blancos",
@@ -226,10 +264,8 @@ product2_1 = {
     "image_url": None,
     "is_visible": True,
     "created_at": datetime.utcnow()
-}
-db.products.insert_one(product2_1)
-
-product2_2 = {
+})
+db.products.insert_one({
     "tenant_id": tenant2_id,
     "type": "coffin",
     "title": "Ataúd Modelo Contemporáneo",
@@ -238,12 +274,34 @@ product2_2 = {
     "image_url": None,
     "is_visible": True,
     "created_at": datetime.utcnow()
-}
-db.products.insert_one(product2_2)
+})
+
+# Funeraria Central
+db.products.insert_one({
+    "tenant_id": tenant3_id,
+    "type": "flower",
+    "title": "Arreglo Floral Elegante",
+    "description": "Arreglo con claveles blancos y rosas en tonos pastel.",
+    "price": 95000,
+    "image_url": None,
+    "is_visible": True,
+    "created_at": datetime.utcnow()
+})
+db.products.insert_one({
+    "tenant_id": tenant3_id,
+    "type": "coffin",
+    "title": "Ataúd Tradicional en Caoba",
+    "description": "Féretro clásico en madera de caoba con herrajes plateados.",
+    "price": None,
+    "image_url": None,
+    "is_visible": True,
+    "created_at": datetime.utcnow()
+})
 
 print("\n✅ Datos de prueba insertados correctamente.")
-print("   - Tenant 1: 'eternidad' con admin admin@eternidad.com / admin123")
-print("   - Tenant 2: 'ejemplo' con admin admin@ejemplo.com / admin123")
+print("   - Tenant 1: 'eternidad' con admin admin@eternidad.com / admineternidad")
+print("   - Tenant 2: 'losolivos' con admin admin@losolivos.com / adminolivos")
+print("   - Tenant 3: 'central'   con admin admin@central.com / admincentral")
 print("   - Productos de ejemplo creados para cada tenant.")
 
 client.close()

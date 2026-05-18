@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 
 export interface LoginResponse {
   access_token: string;
+  tenant_slug: string;
   user: {
     id: string;
     email: string;
@@ -28,14 +29,14 @@ export class AuthService {
     return stored ? JSON.parse(stored) : null;
   }
 
-  login(email: string, password: string, tenantSlug: string): Observable<LoginResponse> {
+  login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.API}/login`, { email, password, tenant_slug: tenantSlug })
+      .post<LoginResponse>(`${this.API}/login`, { email, password })
       .pipe(
         tap(res => {
           localStorage.setItem('access_token', res.access_token);
           localStorage.setItem('current_user', JSON.stringify(res.user));
-          localStorage.setItem('tenant_slug', tenantSlug);
+          localStorage.setItem('tenant_slug', res.tenant_slug);
           this.currentUserSubject.next(res.user);
         })
       );

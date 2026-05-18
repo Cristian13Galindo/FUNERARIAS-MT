@@ -1,14 +1,14 @@
 .admin-layout {
   display: flex;
   min-height: 100vh;
-  background: #0d1117;
+  background: var(--background-color);
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────── */
 .sidebar {
   width: 260px;
-  background: rgba(255,255,255,0.03);
-  border-right: 1px solid rgba(255,255,255,0.07);
+  background: color-mix(in srgb, var(--text-color) 3%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--text-color) 7%, transparent);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -22,11 +22,11 @@
   gap: 0.75rem;
   padding: 1.5rem 1.5rem 1rem;
   font-size: 1.4rem;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-color) 7%, transparent);
 }
 
 .brand-text {
-  color: #bf9f62;
+  color: var(--secondary-color);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -45,7 +45,7 @@
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  color: rgba(255,255,255,0.55);
+  color: color-mix(in srgb, var(--text-color) 55%, transparent);
   text-decoration: none;
   font-size: 0.9rem;
   transition: background 0.2s, color 0.2s;
@@ -53,13 +53,13 @@
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-  background: rgba(191,159,98,0.1);
-  color: #bf9f62;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+  color: var(--secondary-color);
 }
 
 .sidebar-footer {
   padding: 1rem 1.25rem;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid color-mix(in srgb, var(--text-color) 7%, transparent);
 }
 
 .user-info {
@@ -71,21 +71,21 @@
 
 .user-avatar {
   width: 36px; height: 36px;
-  background: linear-gradient(135deg, #bf9f62, #a8853a);
+  background: linear-gradient(135deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 75%, #000));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0d1117;
+  color: var(--background-color);
   font-weight: 700;
   font-size: 0.9rem;
   flex-shrink: 0;
 }
 
 .user-meta { display: flex; flex-direction: column; }
-.user-name { color: #fff; font-size: 0.85rem; font-weight: 600; }
+.user-name { color: var(--text-color); font-size: 0.85rem; font-weight: 600; }
 .user-role {
-  color: rgba(255,255,255,0.35);
+  color: color-mix(in srgb, var(--text-color) 35%, transparent);
   font-size: 0.75rem;
   text-transform: capitalize;
 }
@@ -114,19 +114,19 @@
 .page-header { margin-bottom: 2rem; }
 
 .page-header h1 {
-  color: #fff;
+  color: var(--text-color);
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0 0 0.3rem;
 }
 
 .page-header p {
-  color: rgba(255,255,255,0.4);
+  color: color-mix(in srgb, var(--text-color) 40%, transparent);
   font-size: 0.9rem;
   margin: 0;
 }
 
-.page-header strong { color: #bf9f62; }
+.page-header strong { color: var(--secondary-color); }
 
 /* ── Stats ───────────────────────────────────────────────────────── */
 .stats-grid {
@@ -137,8 +137,8 @@
 }
 
 .stat-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: color-mix(in srgb, var(--text-color) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color) 7%, transparent);
   border-radius: 14px;
   padding: 1.5rem;
   display: flex;
@@ -147,28 +147,28 @@
   transition: border-color 0.3s;
 }
 
-.stat-card:hover { border-color: rgba(191,159,98,0.25); }
+.stat-card:hover { border-color: color-mix(in srgb, var(--secondary-color) 25%, transparent); }
 
 .stat-icon { font-size: 2rem; }
 
 .stat-body { display: flex; flex-direction: column; }
 
 .stat-number {
-  color: #fff;
+  color: var(--text-color);
   font-size: 1.8rem;
   font-weight: 800;
   line-height: 1;
 }
 
 .stat-label {
-  color: rgba(255,255,255,0.4);
+  color: color-mix(in srgb, var(--text-color) 40%, transparent);
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
 
 /* ── Quick Links ─────────────────────────────────────────────────── */
 .quick-links h2 {
-  color: #fff;
+  color: var(--text-color);
   font-size: 1.1rem;
   margin: 0 0 1.25rem;
 }
@@ -180,8 +180,8 @@
 }
 
 .quick-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: color-mix(in srgb, var(--text-color) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-color) 7%, transparent);
   border-radius: 14px;
   padding: 1.5rem;
   text-decoration: none;
@@ -190,20 +190,20 @@
 }
 
 .quick-card:hover {
-  border-color: rgba(191,159,98,0.3);
+  border-color: color-mix(in srgb, var(--secondary-color) 30%, transparent);
   transform: translateY(-3px);
 }
 
 .quick-card > span { font-size: 2rem; display: block; margin-bottom: 0.75rem; }
 
 .quick-card h3 {
-  color: #bf9f62;
+  color: var(--secondary-color);
   font-size: 0.9rem;
   margin: 0 0 0.35rem;
 }
 
 .quick-card p {
-  color: rgba(255,255,255,0.35);
+  color: color-mix(in srgb, var(--text-color) 35%, transparent);
   font-size: 0.8rem;
   line-height: 1.5;
   margin: 0;
