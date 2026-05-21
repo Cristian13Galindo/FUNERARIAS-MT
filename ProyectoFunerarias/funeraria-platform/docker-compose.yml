@@ -33,11 +33,40 @@ services:
     networks:
       - funeraria_net
 
-  frontend:
-    build: ./frontend
-    container_name: funeraria_frontend
+  # ── Frontend: La Eternidad ──────────────────────────────────────────────────
+  frontend-eternidad:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.eternidad
+    container_name: funeraria_frontend_eternidad
     ports:
-      - "4200:80"
+      - "4201:80"
+    depends_on:
+      - backend
+    networks:
+      - funeraria_net
+
+  # ── Frontend: Los Olivos ────────────────────────────────────────────────────
+  frontend-losolivos:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.losolivos
+    container_name: funeraria_frontend_losolivos
+    ports:
+      - "4202:80"
+    depends_on:
+      - backend
+    networks:
+      - funeraria_net
+
+  # ── Frontend: Funeraria Central ─────────────────────────────────────────────
+  frontend-central:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.central
+    container_name: funeraria_frontend_central
+    ports:
+      - "4203:80"
     depends_on:
       - backend
     networks:

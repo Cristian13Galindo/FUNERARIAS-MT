@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -56,26 +56,48 @@ export class TenantService {
   }
 
   /**
+   * Aplica el tema directamente desde el environment compilado (sin petición HTTP).
+   * Se llama al bootstrap para evitar flash de colores incorrectos.
+   */
+  applyThemeFromEnvironment(): void {
+    const t = environment.tenant;
+    if (t?.primaryColor) {
+      this.applyTheme({
+        primary_color:    t.primaryColor,
+        secondary_color:  t.secondaryColor,
+        accent_color:     t.accentColor,
+        background_color: t.backgroundColor,
+        text_color:       t.textColor,
+        name:             t.name,
+        logo_url:         t.logoUrl,
+      });
+    }
+  }
+
+  /**
    * Resuelve el slug del tenant desde:
-   *  1. El localStorage (si el usuario ya está autenticado).
+   *  1. El environment compilado (baked en build — fuente primaria sin URL params).
    *  2. El primer segmento del hostname (ej: eternidad.funeraria.local → "eternidad").
-   *  3. El parámetro ?tenant=slug de la query string.
-   *  4. Fallback: 'eternidad' (para desarrollo local).
+   *  3. El localStorage (si el usuario ya está autenticado).
+   *  4. Fallback: 'eternidad'.
    */
   resolveSlug(): string {
-    const params = new URLSearchParams(window.location.search);
-    const fromQuery = params.get('tenant');
-    if (fromQuery) return fromQuery;
+    // Fuente primaria: slug embebido en el environment del build
+    if (environment.tenant?.slug) {
+      return environment.tenant.slug;
+    }
 
+    // Hostname por subdominio (para despliegue con subdominios reales)
     const hostname = window.location.hostname;
     const parts = hostname.split('.');
     if (parts.length >= 2 && parts[0] !== 'localhost' && parts[0] !== 'www') {
       return parts[0];
     }
 
+    // Sesión previa en localStorage
     const fromStorage = localStorage.getItem('tenant_slug');
     if (fromStorage) return fromStorage;
 
-    return 'eternidad'; // fallback para desarrollo local
+    return 'eternidad';
   }
 }

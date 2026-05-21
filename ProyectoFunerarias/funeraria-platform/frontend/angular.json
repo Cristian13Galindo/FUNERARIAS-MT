@@ -23,6 +23,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
@@ -55,6 +60,33 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "eternidad": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.eternidad.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "losolivos": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.losolivos.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "central": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.central.ts"
+                }
+              ],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -67,6 +99,18 @@
             },
             "development": {
               "buildTarget": "frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "eternidad": {
+              "buildTarget": "frontend:build:eternidad",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "losolivos": {
+              "buildTarget": "frontend:build:losolivos",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "central": {
+              "buildTarget": "frontend:build:central",
               "proxyConfig": "proxy.conf.json"
             }
           },
