@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5000/api',
+  apiUrl: `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:5000/api`,
   tenant: {
     slug: 'central',
     name: 'Funeraria Central',
